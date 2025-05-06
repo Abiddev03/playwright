@@ -14,3 +14,5 @@ npx playwright test --headed
 # for Allure report
 allure generate ./allure-results --clean && allure open
 ```
+
+#for video must need to run allure command
