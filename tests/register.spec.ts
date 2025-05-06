@@ -15,7 +15,7 @@ test.describe('Qrfy Registration Tests', () => {
     const captcha = page.locator('//*[@id="cf-turnstile-widget"]');
     await page.waitForTimeout(2000);
 
-    if (await captcha.isVisible({ timeout: 20000 })) {
+    if (await captcha.isVisible({ timeout: 10000 })) {
       const screenshot = await page.screenshot();
       allure.attachment('CAPTCHA Screenshot', screenshot, 'image/png');
 
@@ -56,17 +56,27 @@ test.describe('Qrfy Registration Tests', () => {
       await page.close();
       await context.close();
 
-      
       const videoPath = testInfo.attachments.find(a => a.name === 'video')?.path;
       if (videoPath && fs.existsSync(videoPath)) {
         const videoBuffer = fs.readFileSync(videoPath);
         allure.attachment('CAPTCHA Video', videoBuffer, 'video/webm');
       }
-
       return;
     }
 
     await register.submit();
     await register.assertError('Email already exists');
+  });
+
+
+  test('should show invalid email error', async ({ page, context }, testInfo) => {
+    const register = new RegisterPage(page);
+    const invalidEmail = 'abidyopmailcom';
+    const password = 'Test@123';
+
+    await register.goto();
+    await register.fillForm(invalidEmail, password);
+
+    await expect(page.locator('text=Email not valid.')).toBeVisible();
   });
 });
